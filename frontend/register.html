@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Authenticity Validator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header>
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <span>Authenticity</span>Validator
+    </a>
+  </header>
+
+  <!-- Register Main Portal -->
+  <main class="auth-container">
+    <div class="glass-card auth-card">
+      <h2>Create Account</h2>
+      <p class="auth-subtitle">Protect academic integrity. Already have an account? <a href="login.html">Sign in</a></p>
+      
+      <form id="register-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" class="form-control" placeholder="Choose a username" required minlength="3" autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Academic Email</label>
+          <input type="email" id="email" class="form-control" placeholder="Enter your email" required autocomplete="email">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Create a strong password" required minlength="6" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" class="form-control" placeholder="Repeat your password" required minlength="6" autocomplete="new-password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="submit-btn">
+          Create Account
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    // Route guard: if logged in, redirect to dashboard.html
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await checkAuthState();
+      if (user) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    const registerForm = document.getElementById('register-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Creating Account...';
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration failed');
+        }
+
+        showToast('Account registered successfully! Redirecting...', 'success');
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1200);
+
+      } catch (error) {
+        showToast(error.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

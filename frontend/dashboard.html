@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Authenticity Validator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header>
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <span>Authenticity</span>Validator
+    </a>
+    <nav class="nav-links">
+      <div class="nav-user-info">
+        <i class="fa-regular fa-circle-user" style="color: var(--accent-primary); font-size: 1.1rem;"></i>
+        Welcome, <span class="username-display" id="user-display">Loading...</span>
+      </div>
+      <button id="logout-btn" class="btn btn-secondary">Sign Out</button>
+    </nav>
+  </header>
+
+  <!-- Main Dashboard Grid -->
+  <main class="dashboard-container">
+    
+    <!-- Left Main Column: Input and Analysis Results -->
+    <div class="dashboard-main">
+      
+      <!-- Document Input Box -->
+      <section class="glass-card analyzer-box" id="input-section">
+        <div class="analyzer-header">
+          <h2>Academic Authenticity Analyzer</h2>
+          <p>Paste your paper text or upload a plain text file below to check its originality and AI signatures.</p>
+        </div>
+
+        <form id="analyzer-form">
+          <div class="form-group">
+            <label for="paper-title">Document Title</label>
+            <input type="text" id="paper-title" class="form-control" placeholder="e.g. Analysis of Neural Networks in Fluid Dynamics" required>
+          </div>
+
+          <div class="textarea-container">
+            <textarea id="paper-text" class="paper-textarea" placeholder="Paste your academic text here (minimum 50 characters)..." required></textarea>
+            <div class="word-counter" id="word-counter">0 words | 0 characters</div>
+          </div>
+
+          <div class="analyzer-actions">
+            <!-- File Picker for document types -->
+            <label class="btn btn-secondary" style="gap: 8px;">
+              <i class="fa-solid fa-file-arrow-up"></i> Upload Document
+              <input type="file" id="file-loader" accept=".txt,.pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx" style="display: none;">
+            </label>
+            
+            <button type="submit" class="btn btn-primary" id="validate-btn" style="gap: 8px;">
+              <i class="fa-solid fa-shield-halved"></i> Verify Authenticity
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Analysis Spinner / Loading State -->
+      <section class="glass-card loading-overlay" id="loading-section">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-stage">Initializing analysis engine...</div>
+        <div class="loading-subtext">Calculating structural perplexity and mapping citation integrity.</div>
+      </section>
+
+      <!-- Analysis Results Dashboard -->
+      <section class="glass-card result-box" id="result-section">
+        <div class="result-header">
+          <div>
+            <h2 id="result-title">Document Authenticity Report</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;" id="result-meta">Analyzed on: July 10, 2026</p>
+          </div>
+          <button class="btn btn-secondary" id="reset-btn" style="gap: 6px;">
+            <i class="fa-solid fa-rotate-left"></i> Analyze New Paper
+          </button>
+        </div>
+
+        <div class="result-summary-grid">
+          <!-- Left: Big SVG Circular Progress Gauge -->
+          <div class="gauge-container">
+            <div class="gauge-svg-wrapper">
+              <svg width="180" height="180">
+                <circle cx="90" cy="90" r="75" class="gauge-ring-bg"></circle>
+                <circle cx="90" cy="90" r="75" class="gauge-ring-value" id="overall-gauge"></circle>
+              </svg>
+              <div class="gauge-text">
+                <span class="gauge-percentage" id="overall-percentage">0%</span>
+                <span class="gauge-label">Authentic</span>
+              </div>
+            </div>
+            <span class="history-badge" id="overall-badge">VERIFIED</span>
+          </div>
+
+          <!-- Right: Horizontal Metric Progress Bars -->
+          <div class="metrics-list">
+            <!-- AI Footprint -->
+            <div class="metric-row">
+              <div class="metric-info">
+                <span class="metric-title"><i class="fa-solid fa-robot" style="color: var(--accent-primary);"></i> AI-Footprint Probability</span>
+                <span class="metric-val" id="ai-score-text">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="ai-progress-bar" style="background-color: var(--accent-primary);"></div>
+              </div>
+            </div>
+
+            <!-- Plagiarism Index -->
+            <div class="metric-row">
+              <div class="metric-info">
+                <span class="metric-title"><i class="fa-solid fa-copy" style="color: var(--color-danger);"></i> Plagiarism Index</span>
+                <span class="metric-val" id="plagiarism-score-text">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="plagiarism-progress-bar" style="background-color: var(--color-danger);"></div>
+              </div>
+            </div>
+
+            <!-- Citation Density -->
+            <div class="metric-row">
+              <div class="metric-info">
+                <span class="metric-title"><i class="fa-solid fa-quote-right" style="color: var(--color-success);"></i> Citation Integrity Index</span>
+                <span class="metric-val" id="citation-score-text">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="citation-progress-bar" style="background-color: var(--color-success);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Recommendation Card -->
+        <div class="recommendation-panel" id="recommendation-card">
+          <div class="recommendation-title" id="rec-title">Analysis Recommendation</div>
+          <div class="recommendation-text" id="rec-desc">This text has successfully verified overall authenticity thresholds. Strong citation references and organic language parameters support genuine original scholarship.</div>
+        </div>
+      </section>
+
+      <!-- Empty State Instruction Panel -->
+      <section class="glass-card empty-state" id="empty-state-section">
+        <div class="empty-state-icon">
+          <i class="fa-solid fa-square-poll-horizontal"></i>
+        </div>
+        <h3>No Analysis Selected</h3>
+        <p>Fill out the form above to trigger a document check, or click on a report in your History to review previous validations.</p>
+      </section>
+
+    </div>
+
+    <!-- Right Column: Verification History -->
+    <div class="dashboard-sidebar">
+      <section class="glass-card history-box">
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> Analysis History</h3>
+        <div class="history-list" id="history-container">
+          <!-- Dynamically filled by JS -->
+          <div class="empty-state" style="padding: 2rem 1rem;">
+            <p style="font-size: 0.85rem;">No validation records found.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

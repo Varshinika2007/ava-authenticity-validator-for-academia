@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Authenticity Validator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header>
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <span>Authenticity</span>Validator
+    </a>
+  </header>
+
+  <!-- Login Main Portal -->
+  <main class="auth-container">
+    <div class="glass-card auth-card">
+      <h2>Welcome Back</h2>
+      <p class="auth-subtitle">Validate your publications. Don't have an account? <a href="register.html">Sign up</a></p>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="emailOrUsername">Email or Username</label>
+          <input type="text" id="emailOrUsername" class="form-control" placeholder="Enter username or email" required autocomplete="username">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Enter password" required autocomplete="current-password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="submit-btn">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    // Route guard: if logged in, redirect to dashboard.html
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await checkAuthState();
+      if (user) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    const loginForm = document.getElementById('login-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const emailOrUsername = document.getElementById('emailOrUsername').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!emailOrUsername || !password) {
+        showToast('Please fill in all fields', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailOrUsername, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Authentication failed');
+        }
+
+        showToast('Signed in successfully! Redirecting...', 'success');
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1200);
+
+      } catch (error) {
+        showToast(error.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>
